@@ -37,11 +37,11 @@ VAR_INST
 	data : ARRAY[0..MAX_STRING_LENGTH] OF BYTE;
 END_VAR
 VAR
-	b : BYTE;
+	read_byte : BYTE;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF input_stream.Read(data => b) THEN
-	data[i] := b;
+        <ST><![CDATA[IF input_stream.Read(data => read_byte) THEN
+	data[i] := read_byte;
 	IF data[i] = 0 THEN
 		line := BYTEARR_TO_MAXSTRING(data);
 		ReadLine := TRUE;
