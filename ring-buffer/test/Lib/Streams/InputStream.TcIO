@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="InputStream" Id="{2133a68a-751b-4292-a136-5a83d8fdbdc8}">
+    <Declaration><![CDATA[INTERFACE PUBLIC InputStream EXTENDS __SYSTEM.IQueryInterface]]></Declaration>
+    <Property Name="Available" Id="{7794b8b1-274a-4681-a9dc-567751b2098a}">
+      <Declaration><![CDATA[PROPERTY PUBLIC Available : UDINT]]></Declaration>
+      <Get Name="Get" Id="{d07a00ba-3d47-4379-8694-a08cc0dd74ac}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="IsMarkSupported" Id="{2e63b0df-55f1-433d-af50-937860f36ebb}">
+      <Declaration><![CDATA[PROPERTY PUBLIC IsMarkSupported : BOOL]]></Declaration>
+      <Get Name="Get" Id="{7accf99b-87ae-4451-af30-627901b6c12e}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Mark" Id="{e40e8b70-4fbc-4e49-a967-cb48c0f60e38}">
+      <Declaration><![CDATA[METHOD PUBLIC Mark
+VAR_INPUT
+	read_limit : UDINT;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="Read" Id="{47a8cdac-f8d0-4eb2-a591-0b8c80bb5ac6}">
+      <Declaration><![CDATA[METHOD Read : BOOL
+VAR_OUTPUT
+	data : BYTE;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="Reset" Id="{5abef460-8d98-464a-9bc7-f637d35243c4}">
+      <Declaration><![CDATA[METHOD PUBLIC Reset]]></Declaration>
+    </Method>
+    <Method Name="Skip" Id="{a20c36e9-bad7-499f-8b0f-5f3c7bfbc18d}">
+      <Declaration><![CDATA[METHOD Skip : UDINT
+VAR_INPUT
+	n : UDINT;
+END_VAR]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

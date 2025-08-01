@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="Test" Id="{9ac0039f-3359-459d-83c4-18b33cc789fe}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Test
+VAR
+	cfb : CircularFifoBuffer<256>;
+	reader : BufferedReader(input_stream := cfb);
+	string_to_write : T_MaxString := 'Start';
+	bytes_to_write : ARRAY[0..MAX_STRING_LENGTH] OF BYTE;
+	
+	write : BOOL;	
+	write_partial : BOOL;
+	write_line_end : BOOL;
+	
+	received_line : T_MaxString;
+	
+	{attribute 'hide'} temp_line : T_MaxString;	
+	{attribute 'hide'} i : INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF write THEN
+	write := FALSE;
+	IF INT_TO_UDINT(LEN(string_to_write)) < cfb.SpaceLeft THEN
+		bytes_to_write := MAXSTRING_TO_BYTEARR(string_to_write);
+		
+		FOR i := 0 TO LEN(string_to_write) DO
+			cfb.Write(bytes_to_write[i]);
+		END_FOR
+	END_IF
+END_IF
+
+IF write_partial THEN
+	write_partial := FALSE;
+	IF INT_TO_UDINT(LEN(string_to_write)) < cfb.SpaceLeft THEN
+		bytes_to_write := MAXSTRING_TO_BYTEARR(string_to_write);
+		
+		FOR i := 0 TO LEN(string_to_write) - 1 DO
+			cfb.Write(bytes_to_write[i]);
+		END_FOR
+	END_IF
+END_IF
+
+IF write_line_end THEN
+	write_line_end := FALSE;
+	
+	IF cfb.SpaceLeft > 0 THEN
+		cfb.Write(0);
+	END_IF
+END_IF
+
+IF reader.ReadLine(line => temp_line) THEN
+	received_line := temp_line;
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

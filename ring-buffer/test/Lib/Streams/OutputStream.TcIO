@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <Itf Name="OutputStream" Id="{956022d5-1c24-4fb3-bfec-21bc3da876e8}">
+    <Declaration><![CDATA[INTERFACE PUBLIC OutputStream EXTENDS __System.IQueryInterface]]></Declaration>
+    <Method Name="Close" Id="{29b22d46-831e-4c2e-879b-c0ebbee3d884}">
+      <Declaration><![CDATA[METHOD PUBLIC Close]]></Declaration>
+    </Method>
+    <Method Name="Flush" Id="{8ecbba24-7588-4fb2-be59-726d55ae5a11}">
+      <Declaration><![CDATA[METHOD PUBLIC Flush]]></Declaration>
+    </Method>
+    <Method Name="Write" Id="{310641f9-105a-40a3-aedc-65afd4ed324c}">
+      <Declaration><![CDATA[METHOD Write : BOOL
+VAR_INPUT
+	data : BYTE;
+END_VAR]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

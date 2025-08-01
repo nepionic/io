@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="CircularFifoBuffer" Id="{579488d7-0ac9-4531-9d29-5b2a9d0d7711}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'linkalways'} 
+{attribute 'no_explicit_call' := 'This FB is a CLASS and must be accessed using methods or properties'}
+{attribute 'enable_dynamic_creation'}
+FUNCTION_BLOCK PUBLIC CircularFifoBuffer
+VAR_GENERIC CONSTANT
+	capacity : UDINT := 64;
+END_VAR
+IMPLEMENTS InputStream, OutputStream
+VAR
+	buffer : ARRAY[0..capacity-1] OF BYTE;
+	read_position : UDINT;
+	write_position : UDINT;
+	mark_position : UDINT;
+	mark_size : UDINT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="InputStream" Id="{e0548d12-134b-4393-bab6-cde22ebcfd6f}" />
+    <Folder Name="InputStreamSupport" Id="{982e37af-b949-4700-b793-3fd7c2e82779}" />
+    <Folder Name="OutputStream" Id="{49889d30-9fde-443e-84b2-a35f0b43cbbe}" />
+    <Folder Name="OutputStreamSupport" Id="{697e668b-34ea-40c5-bda5-c6e7d594791f}" />
+    <Property Name="Available" Id="{22300cf2-08df-490d-a09b-430a8f87851e}" FolderPath="InputStream\">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'call'}
+PROPERTY PUBLIC Available : UDINT]]></Declaration>
+      <Get Name="Get" Id="{b4b2add7-0da7-4362-8b96-1e88d44eca74}">
+        <Declaration><![CDATA[PUBLIC]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF read_position <= write_position THEN
+	// any space between the first read and
+	// the first write is available.  In this case i
+	// is all in one piece.
+	Available := write_position - read_position;
+	RETURN;
+END_IF
+
+// space at the beginning and end.
+Available := capacity - (read_position - write_Position);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Clear" Id="{fcb4fd7c-654d-44f9-9ae6-280f6c046c21}">
+      <Declaration><![CDATA[METHOD PUBLIC Clear]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[read_position := 0;
+write_position := 0;
+mark_position := 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Close" Id="{6a8bc2a5-0e78-47bb-b413-bd3284a668f7}" FolderPath="OutputStream\">
+      <Declaration><![CDATA[{warning 'Add method implementation '}
+METHOD PUBLIC Close]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="EnsureMark" Id="{0167109f-fdaf-4841-8aef-0a9df252c689}" FolderPath="InputStreamSupport\">
+      <Declaration><![CDATA[METHOD INTERNAL EnsureMark]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF Marked > mark_size THEN
+	mark_position := read_position;
+	mark_size := 0;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Flush" Id="{442689a7-0708-4231-9b23-bcf0a031b7d6}" FolderPath="OutputStream\">
+      <Declaration><![CDATA[{warning 'Add method implementation '}
+METHOD PUBLIC Flush]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="IsMarkSupported" Id="{cdfb8bfa-f8e5-4304-ad08-c63442d03bdc}" FolderPath="InputStream\">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'call'}
+PROPERTY PUBLIC IsMarkSupported : BOOL]]></Declaration>
+      <Get Name="Get" Id="{9f615a76-d0a3-48dd-9560-3d503ac4685f}">
+        <Declaration><![CDATA[PUBLIC]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsMarkSupported := FALSE;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Mark" Id="{bc83f40f-76b2-4578-bbc1-1da11d60a9af}" FolderPath="InputStream\">
+      <Declaration><![CDATA[METHOD PUBLIC Mark
+VAR_INPUT
+	read_limit : UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Marked" Id="{c0615b9b-76b2-44d8-ae33-1ccb52ad7a0f}" FolderPath="InputStreamSupport\">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'call'}
+PROPERTY PUBLIC Marked : UDINT]]></Declaration>
+      <Get Name="Get" Id="{87c29072-dfb0-4e1b-acb1-cb7c1a450377}">
+        <Declaration><![CDATA[PUBLIC]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF mark_position <= read_position THEN
+	// any space between the markPosition and
+	// the first write is marked.  In this case i
+	// is all in one piece.
+	Marked := read_position - mark_position;
+	RETURN;
+END_IF
+
+// space at the beginning and end.
+Marked := capacity - (mark_position - read_position);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Read" Id="{18c66433-4cb6-4709-a9aa-df5dff1358d3}" FolderPath="InputStream\">
+      <Declaration><![CDATA[METHOD PUBLIC Read : BOOL
+VAR_OUTPUT
+	data : BYTE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF Available > 0 THEN
+	data := buffer[read_position];
+	read_position := read_position + 1;
+	Read := TRUE;
+	
+	IF read_position = capacity THEN
+		read_position := 0;
+	END_IF
+	
+	EnsureMark();
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{b7fd8d98-592b-4da7-80fa-0c13e256a3ae}" FolderPath="InputStream\">
+      <Declaration><![CDATA[METHOD PUBLIC Reset]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Size" Id="{eb20c37b-d432-49b6-8608-a2eea5b195fb}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'call'}
+PROPERTY PUBLIC Size : UDINT]]></Declaration>
+      <Get Name="Get" Id="{83a2040a-6aa4-4b36-92f6-25c9d9303490}">
+        <Declaration><![CDATA[PUBLIC]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Size := capacity;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Skip" Id="{72eb7fe4-40ba-4f55-ba32-d164338c3251}" FolderPath="InputStream\">
+      <Declaration><![CDATA[METHOD PUBLIC Skip : UDINT
+VAR_INPUT
+	n : UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="SpaceLeft" Id="{4920d4c5-2b88-491d-864a-2a081b7102e6}" FolderPath="OutputStreamSupport\">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'call'}
+PROPERTY PUBLIC SpaceLeft : UDINT]]></Declaration>
+      <Get Name="Get" Id="{4994c995-b30c-4af2-8908-f474da6ed9f8}">
+        <Declaration><![CDATA[PUBLIC]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF write_position < mark_position THEN
+	// any space between the first write and
+	// the mark except one byte is available.
+	// In this case it is all in one piece.
+	SpaceLeft := mark_position - write_position - 1;
+	RETURN;
+END_IF
+
+// space at the beginning and end.
+SpaceLeft := (capacity - 1) - (write_position - mark_position);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Write" Id="{5bef2cfe-9010-4a48-8d1a-141991064b56}" FolderPath="OutputStream\">
+      <Declaration><![CDATA[METHOD PUBLIC Write : BOOL
+VAR_INPUT
+	data : BYTE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF SpaceLeft < 1 THEN
+	RETURN;
+END_IF
+
+buffer[write_position] := data;
+
+write_position := write_position + 1;
+
+IF write_position = capacity THEN
+	write_position := 0;
+END_IF
+
+Write := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

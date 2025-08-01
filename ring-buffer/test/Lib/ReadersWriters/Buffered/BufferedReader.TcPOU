@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="BufferedReader" Id="{ff9fe146-2d15-4fa6-9df6-9990fb96d7db}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'linkalways'} 
+{attribute 'no_explicit_call' := 'This FB is a CLASS and must be accessed using methods or properties'}
+{attribute 'enable_dynamic_creation'}
+FUNCTION_BLOCK BufferedReader IMPLEMENTS Reader
+VAR
+	input_stream : InputStream;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="FB_Init" Id="{f1993338-4bbf-4727-b64c-730f335146c3}">
+      <Declaration><![CDATA[//FB_Init is always available implicitly and it is used primarily for initialization.
+//The return value is not evaluated. For a specific influence, you can also declare the
+//methods explicitly and provide additional code there with the standard initialization
+//code. You can evaluate the return value.
+METHOD FB_Init: BOOL
+VAR_INPUT
+    bInitRetains: BOOL; // TRUE: the retain variables are initialized (reset warm / reset cold)
+    bInCopyCode: BOOL;  // TRUE: the instance will be copied to the copy code afterward (online change)
+	input_stream : InputStream;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[THIS^.input_stream := input_stream;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadLine" Id="{87024f50-596f-4363-83ae-1ad516cfaa04}">
+      <Declaration><![CDATA[METHOD PUBLIC ReadLine : BOOL
+VAR_OUTPUT
+	line : T_MaxString;
+END_VAR
+VAR_INST
+	i : INT;
+	data : ARRAY[0..MAX_STRING_LENGTH] OF BYTE;
+END_VAR
+VAR
+	b : BYTE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF input_stream.Read(data => b) THEN
+	data[i] := b;
+	IF data[i] = 0 THEN
+		line := BYTEARR_TO_MAXSTRING(data);
+		ReadLine := TRUE;
+		i := 0;
+	ELSE
+		i := i + 1;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
