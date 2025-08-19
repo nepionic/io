@@ -26,6 +26,13 @@ VAR_OUTPUT
 	data : BYTE;
 END_VAR]]></Declaration>
     </Method>
+    <Method Name="ReadByteArray" Id="{031d7b35-fffe-4636-a46c-f1a3cdbaf66f}">
+      <Declaration><![CDATA[METHOD ReadByteArray : BOOL
+VAR_OUTPUT
+	data_pointer : POINTER TO BYTE;
+	len : UDINT;
+END_VAR]]></Declaration>
+    </Method>
     <Method Name="Reset" Id="{5abef460-8d98-464a-9bc7-f637d35243c4}">
       <Declaration><![CDATA[METHOD PUBLIC Reset]]></Declaration>
     </Method>

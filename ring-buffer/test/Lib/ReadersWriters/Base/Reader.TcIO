@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
   <Itf Name="Reader" Id="{7276acb6-fffb-4468-8690-6aa1c7cbb0f3}">
-    <Declaration><![CDATA[INTERFACE Reader EXTENDS __SYSTEM.IQueryInterface]]></Declaration>
+    <Declaration><![CDATA[INTERFACE PUBLIC Reader EXTENDS __SYSTEM.IQueryInterface]]></Declaration>
   </Itf>
 </TcPlcObject>

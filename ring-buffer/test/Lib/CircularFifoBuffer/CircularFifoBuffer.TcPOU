@@ -130,6 +130,17 @@ END_VAR]]></Declaration>
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Method Name="ReadByteArray" Id="{c801a44b-b204-41bc-b5e0-eb9142416adc}">
+      <Declaration><![CDATA[{warning 'Add method implementation '}
+METHOD PUBLIC ReadByteArray : BOOL
+VAR_OUTPUT
+	data_pointer : POINTER TO BYTE;
+	len : UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Reset" Id="{b7fd8d98-592b-4da7-80fa-0c13e256a3ae}" FolderPath="InputStream\">
       <Declaration><![CDATA[METHOD PUBLIC Reset]]></Declaration>
       <Implementation>
@@ -193,6 +204,27 @@ IF write_position = capacity THEN
 END_IF
 
 Write := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WriteByteArray" Id="{d9d2bcbe-fbb0-489e-8767-4d6363c26903}">
+      <Declaration><![CDATA[METHOD PUBLIC WriteByteArray : BOOL
+VAR_INPUT
+	data_pointer : POINTER TO BYTE;
+	len : UDINT;
+END_VAR
+VAR
+	i : UDINT;
+	ptr : POINTER TO BYTE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF len <= SpaceLeft THEN
+	FOR i := 0 TO len DO
+		ptr := data_pointer + 1;
+		IF NOT Write(ptr^) THEN
+			RETURN;
+		END_IF
+	END_FOR
+END_IF]]></ST>
       </Implementation>
     </Method>
   </POU>
